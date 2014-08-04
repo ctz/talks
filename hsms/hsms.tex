@@ -17,13 +17,14 @@ http://jbp.io/}
 
 \frame
 {
-  \frametitle{Contents}
+  \frametitle{Intro to HSMs}
 
   \begin{enumerate}
     \item<1> What's a HSM?
     \item<2> Who buys them?
-    \item<3> What do they do, and not do?
-    \item<4> 
+    \item<3> What do they do?
+    \item<4> And not do?
+    \item<5> `Fun' with standards
   \end{enumerate}
 }
 
@@ -58,7 +59,7 @@ http://jbp.io/}
     \item<5-> \emph{Tamper evident} hardware usually potted in epoxy-based compound.
     \item<6-> \emph{Tamper reactive} hardware usually enclosed in tamper sensing membrane, with active response circuitry within.
     \end{itemize}
-  \item<7-> Tamper reactive hardware rare in HSMs; more common in things in adversarial environments like credit card terminals.
+  \item<7-> Tamper reactive hardware rare in HSMs; more common in things in adversarial environments like payments terminals.
   \end{itemize}
 }
 
@@ -77,7 +78,7 @@ http://jbp.io/}
   \uncover<4->{General purpose HSMs:}
 
   \begin{itemize}
-    \item<4-> Standard, reasonably modern crypto.
+    \item<4-> Standard, sometimes modern crypto.
     \item<5-> Integration with standard APIs (OpenSSL, PKCS\#11, Microsoft CNG, etc.)
     \item<6-> Sold to governments and industry.
   \end{itemize}
@@ -93,7 +94,7 @@ http://jbp.io/}
       \begin{itemize}
         \item<3-> Dual control: 'any 3 of these 5 people can use the key'
         \item<4-> Complex key policies: 'this RSA key can only decrypt using OAEP'
-        \item<5-> Allowing backup of key material (two main approaches...)
+        \item<5-> Providing a decent way to back up key material
       \end{itemize}
   \end{itemize}
 }
@@ -105,12 +106,15 @@ http://jbp.io/}
   \begin{itemize}
     \item<1-> HSMs don't know best; they do what they're told
     \begin{itemize}
-      \item<2-> Compromised hosts are a gaping hole in the security model.
+      \item<2-> Compromised hosts are a common overall problem with systems containing HSMs.
                 
-      \uncover<3->{\includegraphics[width=0.3\textwidth]{imgs/diginotarlogo.png}}
+      \uncover<3->{\includegraphics[width=0.5\textwidth]{imgs/diginotarlogo.png}}
 
       \item<4-> Understanding and expressing the policy you want is an ongoing problem.
     \end{itemize}
+
+    \item<5-> Don't do crypto any quicker (in general) than software running on a modern CPU.
+    \item<6-> Don't fix a system using rubbish crypto (RC4, unauthenticated block cipher modes, RSA PKCS\#1 encryption, MD5/SHA1 signatures, ...)
   \end{itemize}
 }
 
@@ -126,6 +130,9 @@ http://jbp.io/}
   \begin{itemize}
     \item<3-> FIPS 140-2 is the main standard for HSMs (and software crypto modules).
     \item<4-> Implemented crypto standards come from NIST, IEEE, ANSI, KISA, etc. usually at request of customers.
+      \begin{itemize}
+        \item<5-> Some requests are `interesting.'
+      \end{itemize}
   \end{itemize}
 }
 
@@ -133,6 +140,12 @@ http://jbp.io/}
 {
   \frametitle{Fin}
   Questions?
+
+  \vspace{5em}
+
+  Twitter: @jpixton
+  
+  Web: http://jbp.io/
 }
 
 \end{document}
