@@ -1,0 +1,130 @@
+Improving PBKDF2 performance for defenders: implementation survey
+
+The Password-Based Key Derivation Function 2 (PBKDF2) is a function described by RSA Laboratories in 1999.  It is now widely used in conjunction with HMAC both as a slow password verification function, and as a key derivation function.
+
+Structural problems in how the function is defined mean naïve implementations are often half the speed of others.  This gives brute-force attackers an unnecessary advantage for a given time budget.
+
+We survey more than 25 PBKDF2 implementations found in crypto libraries, language runtimes and disk encryption systems, and evaluate the algorithmic performance of each.  We reflect on how we got here, and offer some new evaluation ideas for the PHC candidates.
+
+---
+
+Remote 
+
+hash pw in main loop:
+fast: 2i + 2
+slow: 4i
+long-slow: 6i
+
+---
+
+optimised:
+
+jbp@mint-17 ~/cifra $ time ../shitlisp/out/shitlisp --mod=./cifra.so measure-pbkdf2.sl 
+[0394a2ede332c9a13eb82e9b24631604c31df978b4e2f0fbd2c549944f9d79a5] 
+sha256 compressions: 200002
+
+real	0m1.146s
+user	0m0.888s
+sys	0m0.057s
+
+
+naive:
+
+jbp@mint-17 ~/cifra $ time ../shitlisp/out/shitlisp --mod=./cifra.so measure-pbkdf2.sl 
+[0394a2ede332c9a13eb82e9b24631604c31df978b4e2f0fbd2c549944f9d79a5] 
+sha256 compressions: 400000
+
+real	0m2.172s
+user	0m1.811s
+sys	0m0.114s
+
+---
+1. FreeBSD (10):
+  Slow, measures.
+  http://sources.freebsd.org/RELENG_10/sys/geom/eli/pkcs5v2.c
+
+2. GRUB (2.0):
+  Slow
+  https://github.com/mokafive/grub/blob/upstream/grub-core/lib/pbkdf2.c#L89
+
+3. Truecrypt (7.1a):
+  Slow
+  https://github.com/FauxFaux/truecrypt/blob/targz/Common/Pkcs5.c#L131
+
+4. Android (disk encryption):
+  OK
+  scrypt + openssl pbkdf2
+
+5. Android (BouncyCastle):
+  Slow
+  https://android.googlesource.com/platform/external/bouncycastle/+/2768c2948c0b1931bff087e43a8db8059c183b56/bcprov/src/main/java/org/bouncycastle/crypto/generators/PKCS5S2ParametersGenerator.java
+
+6. Django:
+  OK
+  sc00bz CVE-2013-1443
+
+7. OpenSSL:
+  OK 
+  fixed by Christian Heimes 2013-11-03)
+
+8. Python (core >=3.4):
+  OK 
+  Christian Heimes 2013-10-12
+
+9. Python (pypi pbkdf2):
+  Slow
+  https://pypi.python.org/pypi/pbkdf2
+  https://github.com/dlitz/python-pbkdf2/blob/master/pbkdf2.py#L173
+
+10. Ruby:
+  Slow
+  https://rubygems.org/gems/pbkdf2
+
+11. Go (go.crypto):
+  Slow (structurally fast, but hmac module lets it down)
+  https://code.google.com/p/go/source/browse/pbkdf2/pbkdf2.go?repo=crypto
+
+12. OpenBSD:
+  Slow
+  http://cvsweb.openbsd.org/cgi-bin/cvsweb/~checkout~/src/lib/libutil/pkcs5_pbkdf2.c?rev=1.6&content-type=text/plain
+
+13. PolarSSL:
+  Slow
+  https://github.com/polarssl/polarssl/blob/1b4eda3af96a7fb53a327fb3325670a14ff02213/library/pkcs5.c
+
+14. CyaSSL:
+  Slow (structurally fast, but hmac module lets it down)
+  https://github.com/cyassl/cyassl/blob/fc24dca12dd724aea8448fc65ade35527ea3c26c/ctaocrypt/src/pwdbased.c
+
+15. SJCL:
+  OK
+  https://github.com/bitwiseshiftleft/sjcl/blob/136512284d923390c115a735746b965c12f39fd0/core/pbkdf2.js
+
+16. Java:
+  Slow (structurally fast, but hmac module lets it down)
+  http://hg.openjdk.java.net/jdk7/jdk7/jdk/file/9b8c96f96a0f/src/share/classes/com/sun/crypto/provider/HmacCore.java
+
+17. Common Lisp (ironclad):
+  Slow
+  https://github.com/froydnj/ironclad/blob/e0c1067fd5d00552fb4050f8654a610f619b4075/src/pkcs5.lisp#L51
+
+18. Perl (Crypt::PBKDF2):
+  Slow
+  https://metacpan.org/source/ARODLAND/Crypt-PBKDF2-0.142390/lib/Crypt/PBKDF2.pm
+
+19. PHP (core):
+  Slow
+  https://github.com/php/php-src/blob/d0cb715373c3fbe9dc095378ec5ed8c71f799f67/ext/hash/hash.c#L214
+
+20. C# (core):
+  Slow (? code is slightly difficult to follow, but HMAC classes store i_pad+o_pad)
+  http://referencesource.microsoft.com/#mscorlib/system/security/cryptography/rfc2898derivebytes.cs,170
+
+21. scrypt (scrypt and libscrypt)
+  Slow but iterations==1, always.
+  yescrypt also
+  https://github.com/technion/libscrypt/blob/master/sha256.c#L393
+  
+22. LUKS/cryptsetup
+  Varies depending on crypto library
+  https://github.com/mbroz/cryptsetup/tree/3762c8b76ef0f48df5da8509fd1cd3d0d838439c/lib/crypto_backend
