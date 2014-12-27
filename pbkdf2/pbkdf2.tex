@@ -50,10 +50,12 @@ http://jbp.io/}
     maximise attacker work for defender computation budget.
   \end{alertblock}
   
-  \begin{alertblock}{PBKDF2 can produce arbitrary length output}<3>
+  \begin{exampleblock}{Simplification}<3>
+    PBKDF2 can produce arbitrary length output.
+
     We're going to ignore this capability from here on in: only considering
     the first block of output.
-  \end{alertblock}
+  \end{exampleblock}
 }
 
 \frame
@@ -102,7 +104,8 @@ http://jbp.io/}
 {
   \frametitle{Nope!}
 
-  This is actually badly wrong.  Neither PKCS\#5 nor RFC2898 mention this.
+  This is actually wrong.  Neither PKCS\#5 nor RFC2898 mention this, or
+  describe the expected performance.
   \begin{align*}
     \onslide<2->{
     & U_1 \oplus U_2 \oplus \cdots \oplus U_\text{i} \\
