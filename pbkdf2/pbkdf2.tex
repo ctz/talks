@@ -1,0 +1,202 @@
+\documentclass{beamer}
+\usepackage{fancyvrb}
+\usepackage{mathtools}
+\usepackage{amsmath}
+\usepackage{xcolor}
+
+\usecolortheme{rose}
+\usefonttheme{structurebold}
+\setbeamercovered{again covered=\opaqueness<1->{50}}
+\setbeamertemplate{navigation symbols}{}
+
+\newcommand{\highlight}[1]{%
+  \colorbox{red!50}{$\displaystyle#1$}}
+
+\title[pbkdf2]{PBKDF2: how not to do it\footnote{describe a crypto algorithm}}
+\author{Joseph Birr-Pixton\\
+@jpixton\\
+http://jbp.io/}
+\date{}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\frame
+{
+  \frametitle{PBKDF2: quick intro}
+
+  \begin{block}{Purpose}<1>
+    Slowly convert a password + salt into a symmetric key of some length
+  \end{block}
+
+  \begin{block}{Origin}<2>
+    RSA labs, 1999. Described in PKCS\#5 and then RFC2898
+  \end{block}
+}
+
+\frame
+{
+  \frametitle{PBKDF2: quick intro}
+  \begin{block}{Usage}<1>
+    \begin{itemize}
+      \item Password verification (web sites, network services, etc.)
+      \item Key derivation (disk encryption, key management, etc.)
+    \end{itemize}
+  \end{block}
+
+  \begin{alertblock}{Performance}<2>
+    Performance profile is \emph{important} for defenders.  Aim: to
+    maximise attacker work for defender computation budget.
+  \end{alertblock}
+  
+  \begin{alertblock}{PBKDF2 can produce arbitrary length output}<3>
+    We're going to ignore this capability from here on in: only considering
+    the first block of output.
+  \end{alertblock}
+}
+
+\frame
+{
+  \frametitle{PBKDF2: how it was described}
+
+  \begin{align*}
+    \text{PBKDF2}_\text{PRF}(\text{pw}, \text{salt}, \text{i}) &\coloneqq U_1 \oplus U_2 \oplus \cdots \oplus U_\text{i} \\
+    \onslide<2->{
+      \text{where} \\
+      U_1 &\coloneqq \text{PRF}(\text{pw}, \text{salt}\ \Vert\ 0_{32}) \\
+      U_n &\coloneqq \text{PRF}(\text{pw}, U_{n-1}) \\
+    }
+    \onslide<3->{
+      \text{and typically} \\
+      \text{PRF}(\text{pw}, \text{x}) &\coloneqq \text{HMAC-H}(\text{pw}, \text{x}) \\
+      H &\coloneqq \text{SHA-1, SHA-256 or SHA-512}
+    }
+  \end{align*}
+}
+
+\frame
+{
+  \frametitle{Zoom, enhance}
+
+  The function $\text{PBKDF2}_{\text{HMAC-SHA-256}}$ is slow because it
+  executes the SHA-256 compression function many times.
+
+  \begin{block}{How many times?}<2->
+    Assumption: password and salt much shorter than SHA-256's 64-byte block size.
+  \begin{align*}
+    \text{HMAC-H}(k, m) &\coloneqq
+      \text{H}(\alert<5>{k \oplus \text{opad}}\ \Vert\ 
+      \alert<6>{\text{H}(\alert<3>{k \oplus \text{ipad}}\ \Vert\ \alert<4>{m})}) \\
+    \onslide<3>{\text{block 1} &: k \oplus \text{ipad}} \\
+    \onslide<4>{\text{block 2} &: m} \\
+    \onslide<5>{\text{block 3} &: k \oplus \text{opad}} \\
+    \onslide<6>{\text{block 4} &: \text{block 2 output}}
+  \end{align*}
+
+  \uncover<7->{Therefore, we need to compute $4\text{i}$ SHA-256 blocks.}
+  \end{block}
+}
+
+\frame
+{
+  \frametitle{Nope!}
+
+  This is actually badly wrong.  Neither PKCS\#5 nor RFC2898 mention this.
+  \begin{align*}
+    \onslide<2->{
+    & U_1 \oplus U_2 \oplus \cdots \oplus U_\text{i} \\
+    }
+    \onslide<3->{
+      \text{with} \\
+      U_1 &\coloneqq \text{HMAC-H}(\text{pw}, \text{salt}\ \Vert\ 0_{32}) \\
+      U_n &\coloneqq \text{HMAC-H}(\text{pw}, U_{n-1}) \\
+    }
+    \onslide<4->{
+      \text{(or equivalently)} \\
+      U_1 &\coloneqq \text{H}(\alert<5>{\text{pw} \oplus \text{opad}}\ \Vert\ \text{H}(\alert<5>{pw \oplus \text{ipad}}\ \Vert\ \text{salt}\ \Vert\ 0_{32})) \\
+      U_n &\coloneqq \text{H}(\alert<5>{\text{pw} \oplus \text{opad}}\ \Vert\ \text{H}(\alert<5>{pw \oplus \text{ipad}}\ \Vert\ U_{n-1}))
+    }
+  \end{align*}
+
+  \uncover<5->{We can precompute these blocks!}
+
+  \begin{block}{How many times?}<6->
+    Actually, we only need compute $2 + 2i$ SHA-256 blocks.
+  \end{block}
+}
+
+\frame
+{
+  \frametitle{Our survey says...}
+
+  \begin{columns}[T]
+    \column{.48\textwidth}
+    \begin{exampleblock}{Good: compute $2 + 2i$ blocks}
+      \begin{itemize}
+        \item OpenSSL (after Nov 2013)
+        \item Python core ($\ge$3.4)
+        \item Django (CVE-2013-1443)
+        \item SJCL
+        \item BouncyCastle ($\ge$1.49)
+      \end{itemize}
+    \end{exampleblock}
+   
+    \uncover<2->{
+    \begin{alertblock}{Bad: compute $4i$ blocks}
+      \begin{itemize}
+        \item FreeBSD
+        \item GRUB
+        \item Android (BouncyCastle)
+      \end{itemize}
+    \end{alertblock}
+    }
+
+    \column{.48\textwidth}
+    \uncover<3->{
+    \begin{alertblock}{Bad: compute $4i$ blocks}
+      \begin{itemize}
+        \item Python (pypi pbkdf2)
+        \item Ruby (pbkdf2 gem)
+        \item Go (go.crypto)
+        \item OpenBSD
+        \item PolarSSL
+        \item CyaSSL
+        \item Java (OpenJDK)
+        \item Common Lisp (ironclad)
+        \item Perl (Crypt::PBKDF2)
+        \item PHP
+        \item C\#
+      \end{itemize}
+    \end{alertblock}
+    }
+
+  \end{columns}
+}
+
+\frame
+{
+  \frametitle{Parting thoughts...}
+
+  \begin{itemize}
+    \item<1-> PBKDF2 is not wonderfully designed.
+    \item<2-> Described in an unhelpful way by its authors.
+    \item<3-> Most implementations gift a 2x advantage to attackers.
+  \end{itemize}
+}
+
+\frame
+{
+  \frametitle{Thank you!}
+  Questions?
+
+  \vspace{5em}
+
+  Twitter: @jpixton
+
+  Mail: jbp@jbp.io
+  
+  Web: http://jbp.io/
+}
+
+\end{document}

@@ -124,7 +124,8 @@ sys	0m0.114s
   Slow but iterations==1, always.
   yescrypt also
   https://github.com/technion/libscrypt/blob/master/sha256.c#L393
-  
-22. LUKS/cryptsetup
-  Varies depending on crypto library
-  https://github.com/mbroz/cryptsetup/tree/3762c8b76ef0f48df5da8509fd1cd3d0d838439c/lib/crypto_backend
+ 
+22. bouncycastle
+  OK (>= 1.49)
+  https://github.com/bcgit/bc-java/blob/master/core/src/main/java/org/bouncycastle/crypto/generators/PKCS5S2ParametersGenerator.java
+   
