@@ -23,7 +23,7 @@ class Test
   {
     try
     {
-      int iterations = 1 << 20;
+      int iterations = 1 << 22;
       byte[] v = PBKDF2("password", "saltsalt", iterations);
       System.out.print("SHA1," + iterations + ",");
       for (int i = 0; i < v.length; i++)

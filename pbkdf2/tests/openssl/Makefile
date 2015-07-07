@@ -1,5 +1,5 @@
 
-CFLAGS += -Wall -Werror -std=gnu99
+CFLAGS += -Wall -Werror -std=gnu99 -O3
 LDLIBS += -lcrypto
 
 all: test

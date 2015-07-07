@@ -1,5 +1,5 @@
 
-CFLAGS += -O3 -Wall -Werror -std=gnu99 -Icifra/src -I cifra/src/ext
+CFLAGS += -g -O3 -Wall -Werror -std=gnu99 -Icifra/src -I cifra/src/ext
 VPATH = cifra/src
 
 all: test

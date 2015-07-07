@@ -3,7 +3,7 @@
 int main(void)
 {
   unsigned char out[20];
-  int iterations = 1 << 23;
+  int iterations = 1 << 22;
   PKCS5_PBKDF2_HMAC_SHA1("password", 8,
                          (const unsigned char *) "saltsalt", 8,
                          iterations,
