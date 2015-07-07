@@ -1,10 +1,18 @@
 Improving PBKDF2 performance for defenders: implementation survey
 
-The Password-Based Key Derivation Function 2 (PBKDF2) is a function described by RSA Laboratories in 1999.  It is now widely used in conjunction with HMAC both as a slow password verification function, and as a key derivation function.
+The Password-Based Key Derivation Function 2 (PBKDF2) is a function
+described by RSA Laboratories in 1999.  It is now widely used in
+conjunction with HMAC both as a slow password verification function,
+and as a key derivation function.
 
-Structural problems in how the function is defined mean naïve implementations are often half the speed of others.  This gives brute-force attackers an unnecessary advantage for a given time budget.
+Structural problems in how the function is defined mean naïve
+implementations are often half the speed of others.  This gives
+brute-force attackers an unnecessary advantage for a given time budget.
 
-We survey more than 25 PBKDF2 implementations found in crypto libraries, language runtimes and disk encryption systems, and evaluate the algorithmic performance of each.  We reflect on how we got here, and offer some new evaluation ideas for the PHC candidates.
+We survey more than 25 PBKDF2 implementations found in crypto libraries,
+language runtimes and disk encryption systems, and evaluate the
+algorithmic performance of each.  We reflect on how we got here,
+and offer some new evaluation ideas for the PHC candidates.
 
 ---
 
