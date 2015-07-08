@@ -8,8 +8,4 @@ clean:
 	for x in $(DIRS); do $(MAKE) -C $$x clean ; done
 
 results:
-	for x in $(DIRS); do \
-	  echo $$x ; \
-	  grep -oE '[0-9\.]+user' $$x/timing ; \
-	  cat $$x/result ; \
-	done
+	python results.py $(DIRS)
