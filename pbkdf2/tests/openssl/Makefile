@@ -3,7 +3,7 @@ CFLAGS += -Wall -Werror -std=gnu99 -O3
 LDLIBS += -lcrypto
 
 all: test
-	time ./test >result 2>timing
+	for x in 1 2 3 4 5 ; do time ./test >result.$$x 2>timing.$$x ; done
 
 test: test.o
 

@@ -12,15 +12,20 @@ export = dict(
         phppatch = 'php5-new'
 )
 
+def read_res(fn):
+    tf = open(fn).read()
+    time = re.search(r'([0-9\.]+)user', tf).group(1)
+    return float(time)
+
 if __name__ == '__main__':
     tests = sys.argv[1:]
     timings = {}
 
     for dir in tests:
         name = dir.replace('/', '')
-        tf = open(path.join(dir, 'timing')).read()
-        time = re.search(r'([0-9\.]+)user', tf).group(1)
-        timings[name] = time
+        best_time = min([read_res(path.join(dir, 'timing.%s' % x)) for x in '12345'])
+
+        timings[name] = best_time
 
     print timings
 
