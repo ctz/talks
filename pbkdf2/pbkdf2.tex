@@ -237,6 +237,7 @@ http://jbp.io/}
 
     \node[fast,label=right:\nodejstime] at (5,\nodejstime) {};
     \node[thing] at (5,-1) {node.js};
+    % all openssl/openssl-derived
     }
 
     \uncover<3-> {
@@ -244,13 +245,13 @@ http://jbp.io/}
     \node[thing] at (7,-2) {PHP5};
 
     \node[slow,label=right:\javaopenjdktime] (java) at (9,\javaopenjdktime) {};
-    \node[thing] at (9,-1) {Java OpenJDK};
+    \node[thing] at (9,-1) {Java};
 
     \node[slow,label=right:\golangtime] (golang) at (11,\golangtime) {};
     \node[thing] at (11,-2) {Go};
     }
 
-    \uncover<4-> {
+    \visible<4-5> {
     \node[fast,label=right:\phppatchtime] (phppatch) at (7,\phppatchtime) {};
     \draw [->] (php) -- (phppatch);
     % pull req https://github.com/php/php-src/pull/1387
@@ -280,7 +281,7 @@ http://jbp.io/}
 {
   \frametitle{fastpbkdf2}
 
-  A faster PBKDF2 for defenders.
+  A faster PBKDF2-HMAC-\{SHA-1,SHA-256,SHA-512\} for defenders.
 
   \begin{itemize}
     \item<1-> About 400 lines of C99.
