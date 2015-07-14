@@ -265,7 +265,7 @@ http://jbp.io/}
     }
 
     \uncover<6-> {
-    \node[fast,label=right:\superfasttime] at (13,\superfasttime) {};
+    \node[fast,label=right:\fastpbkdftime] at (13,\fastpbkdftime) {};
     \node[thing] at (13,-1) {fastpbkdf2};
     }
 
@@ -278,13 +278,28 @@ http://jbp.io/}
 
 \frame
 {
+  \frametitle{fastpbkdf2}
+
+  A faster PBKDF2 for defenders.
+
+  \begin{itemize}
+    \item<1-> About 400 lines of C99.
+    \item<2-> Uses OpenSSL libcrypto's hash functions.
+    \item<3-> CC0.
+    \item<4-> https://github.com/ctz/fastpbkdf2/
+  \end{itemize}
+}
+
+\frame
+{
   \frametitle{Parting thoughts...}
 
   \begin{itemize}
     \item<1-> PBKDF2 is a poor design, and described in an unhelpful way by its authors.
     \item<2-> Most implementations waste time and power.
-    \item<3-> If you use PBKDF2, you can probably drop in a faster implementation and either
-              increase security margin, or improve performance.
+    \item<3-> If you use PBKDF2, you can probably drop in a faster implementation\only<3>{.}
+              \only<4>{and either
+              increase security margin, or improve time/power performance.}
   \end{itemize}
 }
 
@@ -303,7 +318,7 @@ http://jbp.io/}
 
   Slides: https://github.com/ctz/talks/
 
-  Code: https://github.com/ctz/pbkdf2/
+  Code: https://github.com/ctz/fastpbkdf2/
 }
 
 \end{document}

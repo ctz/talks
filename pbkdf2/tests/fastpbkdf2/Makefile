@@ -5,7 +5,7 @@ LDLIBS += -lcrypto
 all: test
 	time ./test >result 2>timing
 
-test: test.o
+test: test.o fastpbkdf2/fastpbkdf2.o
 
 clean:
 	rm -rf *.o test
