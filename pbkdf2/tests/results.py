@@ -5,7 +5,6 @@ export = dict(
         openssl = 'openssl',
         python = 'python-34',
         nodejs = 'nodejs',
-        mono = 'mono',
         fastpbkdf = 'fastpbkdf2',
         javaopenjdk = 'java-jdk',
         golang = 'golang',
