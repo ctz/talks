@@ -64,8 +64,9 @@ http://jbp.io/}
   \begin{exampleblock}{Simplification}<3>
     PBKDF2 can produce arbitrary length output.
 
-    We're going to ignore this capability from here on in: only considering
-    the first block of output.
+    We're going to ignore this capability
+    from here on in: only considering the first block of output.
+    %\footnote{because it's broken, and complicates matters}
   \end{exampleblock}
 }
 
@@ -258,10 +259,10 @@ http://jbp.io/}
     }
 
     \visible<5> {
-    \node[maybefast,label=right:?] (javamaybefast) at (9,\javaopenjdktime*0.5) {};
+    \node[maybefast,label=right:?] (javamaybefast) at (9,\javaopenjdktime*\phppatchtime/\phptime) {};
     \draw [maybe,->] (java) -- (javamaybefast);
 
-    \node[maybefast,label=right:?] (golangmaybefast) at (11,\golangtime*0.5) {};
+    \node[maybefast,label=right:?] (golangmaybefast) at (11,\golangtime*\phppatchtime/\phptime) {};
     \draw [maybe,->] (golang) -- (golangmaybefast);
     }
 

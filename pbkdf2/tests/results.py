@@ -23,13 +23,18 @@ if __name__ == '__main__':
 
     for dir in tests:
         name = dir.replace('/', '')
-        best_time = min([read_res(path.join(dir, 'timing.%s' % x)) for x in '12345'])
+
+        if path.exists(path.join(dir, 'timing')):
+            best_time = read_res(path.join(dir, 'timing'))
+        else:
+            best_time = min([read_res(path.join(dir, 'timing.%s' % x)) for x in '12345'])
 
         timings[name] = best_time
 
     print timings
 
-    with open('../measurements.tex', 'w') as f:
-        for name, test in export.items():
-            print >>f, '\def \%stime {%s}' % (name, timings[test])
+    if 'openssl' in timings:
+        with open('../measurements.tex', 'w') as f:
+            for name, test in export.items():
+                print >>f, '\def \%stime {%s}' % (name, timings[test])
 
