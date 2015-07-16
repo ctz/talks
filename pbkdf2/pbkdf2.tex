@@ -91,7 +91,7 @@ http://jbp.io/}
 
 \frame
 {
-  \frametitle{Zoom, enhance}
+  \frametitle{Zoom, enhance} \beginner
 
   The function $\text{PBKDF2}_{\text{HMAC-SHA-256}}$ is slow because it
   executes the SHA-256 compression function many times.
@@ -116,7 +116,7 @@ http://jbp.io/}
 {
   \frametitle{Nope!}
 
-  This is actually wrong.  Neither PKCS\#5 nor RFC2898 mention this, or
+  This is suboptimal.  Neither PKCS\#5 nor RFC2898 mention this, or
   describe the expected performance.
   \begin{align*}
     \onslide<2->{
@@ -143,6 +143,46 @@ http://jbp.io/}
 
 \frame
 {
+  \frametitle{Survey of defender implementations}
+
+  I looked at the following PBKDF2s:
+
+  \begin{columns}[T]
+    \column{.48\textwidth}
+    \begin{itemize}
+      \item FreeBSD 10
+      \item GRUB 2.0
+      \item Truecrypt 7.1a
+      \item Android (disk encryption)
+      \item Android (ancient BouncyCastle fork)
+      \item Django
+      \item OpenSSL
+      \item Python core ($\ge$3.4)
+      \item Python (pypi pbkdf2)
+      \item Ruby (pbkdf2 gem)
+      \item Go (go.crypto)
+    \end{itemize}
+    \column{.48\textwidth}
+    \begin{itemize}
+      \item OpenBSD
+      \item PolarSSL/mbedTLS
+      \item CyaSSL/wolfSSL
+      \item SJCL
+      \item Java
+      \item Common Lisp (ironclad)
+      \item Perl (Crypt::PBKDF2)
+      \item PHP5
+      \item .NET framework
+      \item scrypt/yescrypt\footnotemark
+      \item BouncyCastle
+    \end{itemize}
+  \end{columns}
+  
+  \footnotetext[1]{never called for scrypt/yescrypt with iterations != 1}
+}
+
+\frame
+{
   \frametitle{Our survey says...}
 
   \begin{columns}[T]
@@ -158,10 +198,10 @@ http://jbp.io/}
     \end{exampleblock}
    
     \uncover<3->{
-    \begin{alertblock}{Bad: compute $4i$ blocks}
+    \begin{alertblock}{Slow: compute $4i$ blocks}
       \begin{itemize}
-        \item FreeBSD
-        \item GRUB
+        \item FreeBSD 10
+        \item GRUB 2.0
         \item Android (BouncyCastle)
       \end{itemize}
     \end{alertblock}
@@ -169,19 +209,20 @@ http://jbp.io/}
 
     \column{.48\textwidth}
     \uncover<4->{
-    \begin{alertblock}{Bad: compute $4i$ blocks}
+    \begin{alertblock}{Slow: compute $4i$ blocks}
       \begin{itemize}
         \item Python (pypi pbkdf2)
         \item Ruby (pbkdf2 gem)
         \item Go (go.crypto)
         \item OpenBSD
-        \item PolarSSL
-        \item CyaSSL
+        \item PolarSSL/mbedTLS
+        \item CyaSSL/wolfSSL
         \item Java (OpenJDK)
         \item Common Lisp (ironclad)
         \item Perl (Crypt::PBKDF2)
         \item PHP
-        \item C\#
+        \item .NET framework
+        \item ...
       \end{itemize}
     \end{alertblock}
     }
@@ -235,40 +276,37 @@ http://jbp.io/}
     \uncover<2-> {
     \node[fast,label=right:\pythontime] at (3,\pythontime) {};
     \node[thing] at (3,-2) {Python 3.4};
-
-    \node[fast,label=right:\nodejstime] at (5,\nodejstime) {};
-    \node[thing] at (5,-1) {node.js};
     % all openssl/openssl-derived
     }
 
     \uncover<3-> {
-    \node[slow,label=right:\phptime] (php) at (7,\phptime) {};
-    \node[thing] at (7,-2) {PHP5};
+    \node[slow,label=right:\phptime] (php) at (5,\phptime) {};
+    \node[thing] at (5,-1) {PHP5};
 
-    \node[slow,label=right:\javaopenjdktime] (java) at (9,\javaopenjdktime) {};
-    \node[thing] at (9,-1) {Java};
+    \node[slow,label=right:\javaopenjdktime] (java) at (7,\javaopenjdktime) {};
+    \node[thing] at (7,-2) {Java};
 
-    \node[slow,label=right:\golangtime] (golang) at (11,\golangtime) {};
-    \node[thing] at (11,-2) {Go};
+    \node[slow,label=right:\golangtime] (golang) at (9,\golangtime) {};
+    \node[thing] at (9,-1) {Go};
     }
 
     \visible<4-5> {
-    \node[fast,label=right:\phppatchtime] (phppatch) at (7,\phppatchtime) {};
+    \node[fast,label=right:\phppatchtime] (phppatch) at (5,\phppatchtime) {};
     \draw [->] (php) -- (phppatch);
     % pull req https://github.com/php/php-src/pull/1387
     }
 
     \visible<5> {
-    \node[maybefast,label=right:?] (javamaybefast) at (9,\javaopenjdktime*\phppatchtime/\phptime) {};
+    \node[maybefast,label=right:?] (javamaybefast) at (7,\javaopenjdktime*\phppatchtime/\phptime) {};
     \draw [maybe,->] (java) -- (javamaybefast);
 
-    \node[maybefast,label=right:?] (golangmaybefast) at (11,\golangtime*\phppatchtime/\phptime) {};
+    \node[maybefast,label=right:?] (golangmaybefast) at (9,\golangtime*\phppatchtime/\phptime) {};
     \draw [maybe,->] (golang) -- (golangmaybefast);
     }
 
     \uncover<6-> {
-    \node[fast,label=right:\fastpbkdftime] at (13,\fastpbkdftime) {};
-    \node[thing] at (13,-1) {fastpbkdf2};
+    \node[fast,label=right:\fastpbkdftime] at (11,\fastpbkdftime) {};
+    \node[thing] at (11,-2) {fastpbkdf2};
     }
 
   \end{tikzpicture}
