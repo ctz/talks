@@ -250,7 +250,7 @@ http://jbp.io/}
   \centering
 
   \begin{tikzpicture}[
-    y = .5cm,
+    y = .25cm,
     x = .7cm,
     font = \small\sffamily,
     fast/.style = {circle, draw=green!50, fill=green!20, thick, inner sep=0.8mm, outer sep=1mm},
@@ -259,14 +259,14 @@ http://jbp.io/}
     thing/.style = {font=\footnotesize},
     maybe/.style = {draw=black!50},
   ]
-    \draw (0,0) -- coordinate (y axis mid) (0,10);
+    \draw (0,0) -- coordinate (y axis mid) (0,22);
     \draw (0,0) -- (14,0);
-    \foreach \y in {0,1,...,10} {
+    \foreach \y in {0,2,...,22} {
       \draw (0pt,\y) -- (-3pt,\y) node[anchor=east] {\y};
       \draw (0,\y) -- (14,\y) [gray!30];
     }
-    \foreach \y in {0,1,...,9} {
-      \draw (0pt,\y+0.5) -- (-1pt,\y+0.5);
+    \foreach \y in {1,3,...,21} {
+      \draw (0pt,\y) -- (-1pt,\y);
     }
     \node[rotate=90, above=0.8cm] at (y axis mid) {Seconds};
 
