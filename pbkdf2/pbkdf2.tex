@@ -32,6 +32,22 @@ http://jbp.io/}
 
 \frame{\titlepage}
 
+\frame
+{
+  \begin{columns}[c]
+    \column{.48\textwidth}
+      \includegraphics[width=4.7cm]{imgs/16years.png}\vspace{1mm}
+
+      \includegraphics[width=1.5cm]{imgs/anger.png}\hspace{1mm}\includegraphics[width=1.5cm]{imgs/crypto.png}\hspace{1mm}\includegraphics[width=1.5cm]{imgs/standards.png}
+    \column{.48\textwidth}
+      \begin{enumerate}
+        \item<1> Quick intro to PBKDF2
+        \item<2> The standard is bad
+        \item<3> Your implementation is bad
+        \item<4> A faster PBKDF2
+      \end{enumerate}
+  \end{columns}
+}
 
 \frame
 {
@@ -99,12 +115,12 @@ http://jbp.io/}
   \begin{block}{How many times?}<2->
     Assumption: password and salt much shorter than SHA-256's 64-byte block size.
   \begin{align*}
-    \text{HMAC-H}(k, m) &\coloneqq
-      \text{H}(\alert<5>{k \oplus \text{opad}}\ \Vert\ 
-      \alert<6>{\text{H}(\alert<3>{k \oplus \text{ipad}}\ \Vert\ \alert<4>{m})}) \\
-    \onslide<3>{\text{block 1} &: k \oplus \text{ipad}} \\
-    \onslide<4>{\text{block 2} &: m} \\
-    \onslide<5>{\text{block 3} &: k \oplus \text{opad}} \\
+    \text{HMAC-H}(key, msg) &\coloneqq
+      \text{H}(\alert<5>{key \oplus \text{opad}}\ \Vert\ 
+      \alert<6>{\text{H}(\alert<3>{key \oplus \text{ipad}}\ \Vert\ \alert<4>{msg})}) \\
+    \onslide<3>{\text{block 1} &: key \oplus \text{ipad}} \\
+    \onslide<4>{\text{block 2} &: msg} \\
+    \onslide<5>{\text{block 3} &: key \oplus \text{opad}} \\
     \onslide<6>{\text{block 4} &: \text{block 2 output}}
   \end{align*}
 
@@ -116,8 +132,11 @@ http://jbp.io/}
 {
   \frametitle{Nope!}
 
-  This is suboptimal.  Neither PKCS\#5 nor RFC2898 mention this, or
-  describe the expected performance.
+  This is suboptimal.  Neither of the standards mention this, or
+  even describe the expected performance :(
+
+  \only<1>{\vspace{1cm}\includegraphics[width=11cm]{imgs/dilbert-2009-09-01.png}}
+
   \begin{align*}
     \onslide<2->{
     & U_1 \oplus U_2 \oplus \cdots \oplus U_\text{i} \\
@@ -129,12 +148,12 @@ http://jbp.io/}
     }
     \onslide<4->{
       \text{(or equivalently)} \\
-      U_1 &\coloneqq \text{H}(\alert<5>{\text{pw} \oplus \text{opad}}\ \Vert\ \text{H}(\alert<5>{pw \oplus \text{ipad}}\ \Vert\ \text{salt}\ \Vert\ 0_{32})) \\
-      U_n &\coloneqq \text{H}(\alert<5>{\text{pw} \oplus \text{opad}}\ \Vert\ \text{H}(\alert<5>{pw \oplus \text{ipad}}\ \Vert\ U_{n-1}))
+      U_1 &\coloneqq \text{H}(\alert<5->{\text{pw} \oplus \text{opad}}\ \Vert\ \text{H}(\alert<5->{pw \oplus \text{ipad}}\ \Vert\ \text{salt}\ \Vert\ 0_{32})) \\
+      U_n &\coloneqq \text{H}(\alert<5->{\text{pw} \oplus \text{opad}}\ \Vert\ \text{H}(\alert<5->{pw \oplus \text{ipad}}\ \Vert\ U_{n-1}))
     }
   \end{align*}
 
-  \uncover<5->{We can compute these blocks once}
+  \uncover<5->{We can compute these blocks once.}
 
   \begin{block}{How many times?}<6->
     Actually, we only need compute $2 + 2i$ SHA-256 blocks.
@@ -154,7 +173,7 @@ http://jbp.io/}
       \item GRUB 2.0
       \item Truecrypt 7.1a
       \item Android (disk encryption)
-      \item Android (ancient BouncyCastle fork)
+      \item Android (BouncyCastle)
       \item Django
       \item OpenSSL
       \item Python core ($\ge$3.4)
@@ -340,6 +359,7 @@ http://jbp.io/}
     \item<3-> If you use PBKDF2, you can probably drop in a faster implementation\only<3>{.}
               \only<4>{and either
               increase security margin, or improve time/power performance.}
+    \item<4-> Please try not to use PBKDF2 any more.
   \end{itemize}
 }
 
@@ -356,9 +376,7 @@ http://jbp.io/}
 
   Web: https://jbp.io/
 
-  Slides: https://github.com/ctz/talks/
-
-  Code: https://github.com/ctz/fastpbkdf2/
+  Slides and benchmarking code: https://github.com/ctz/talks/
 }
 
 \end{document}
