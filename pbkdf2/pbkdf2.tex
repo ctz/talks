@@ -53,31 +53,30 @@ http://jbp.io/}
 {
   \frametitle{PBKDF2: quick intro} \beginner
 
-  \begin{block}{Purpose}<1>
-    Slowly convert a password + salt into a symmetric key of some length
-  \end{block}
+  Purpose: deterministically and slowly derive a value from a password and salt.
 
   \begin{block}{Origin}<2>
     RSA labs, 1999. Described in PKCS\#5 and then RFC2898
+  \end{block}
+  
+  \begin{block}{Usage}<3>
+    \begin{itemize}
+      \item Password verification (web sites, network services, etc.)
+      \item Key derivation (disk encryption, key management, etc.)
+    \end{itemize}
   \end{block}
 }
 
 \frame
 {
   \frametitle{PBKDF2: quick intro} \beginner
-  \begin{block}{Usage}<1>
-    \begin{itemize}
-      \item Password verification (web sites, network services, etc.)
-      \item Key derivation (disk encryption, key management, etc.)
-    \end{itemize}
-  \end{block}
 
-  \begin{alertblock}{Performance}<2>
+  \begin{alertblock}{Performance}<1>
     Performance profile is \emph{important} for defenders.  Aim: to
     maximise attacker work for defender computation budget.
   \end{alertblock}
 
-  \begin{exampleblock}{Simplification}<3>
+  \begin{exampleblock}{Simplification}<2>
     PBKDF2 can produce arbitrary length output.
 
     We're going to ignore this capability
