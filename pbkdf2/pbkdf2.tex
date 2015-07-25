@@ -8,6 +8,7 @@
 
 \usetikzlibrary{calc}
 \usetikzlibrary{positioning}
+\usetikzlibrary{arrows}
 
 \usecolortheme{rose}
 \usefonttheme{structurebold}
@@ -80,9 +81,9 @@ http://jbp.io/}
     \node (init) {init};
     \node[compf] (h0) [right=1 of init] {h};
     \node[compf] (h1) [right=of h0] {h};
-    \node (x0) [above=of h0] {$"hello"$};
-    \node (x1) [above=of h1] {$"world"$};
-    \node (final) [right=of h1] {$H("hello world")$};
+    \node (x0) [above=of h0] {$"\texttt{hello}"$};
+    \node (x1) [above=of h1] {$"\texttt{world}"$};
+    \node (final) [right=of h1] {$H("\texttt{helloworld}")$};
     \draw [->] (init) -- (h0);
     \draw [->] (h0) -- (h1);
     \draw [->] (h1) -- (final);
@@ -90,9 +91,11 @@ http://jbp.io/}
     \draw [->] (x1) -- (h1);
 
     \uncover<2>{
-      \node (clabel) [below=of init] {"compression function"};
+      \node (clabel) [below=of init] {compression function};
       \draw [->,labela] (clabel) -- (h0);
 
+      \draw [<->,labela] ($ (x0.north west) + (1,1) $) -- ($ (x0.north east) + (-1,1) $)
+        node [above,align=center,midway] {block size};
     }
 
   \end{tikzpicture}
@@ -107,7 +110,6 @@ http://jbp.io/}
 
   \begin{center}
   \begin{tikzpicture}[
-    remember picture,
     y = .25cm,
     x = .25cm,
     font = \small\sffamily,
@@ -149,11 +151,10 @@ http://jbp.io/}
 
 \frame
 {
-  \frametitle{Intro: HMAC} \beginner
+  \frametitle{Intro: HMAC innards} \beginner
 
   \begin{center}
   \begin{tikzpicture}[
-    remember picture,
     y = .25cm,
     x = .25cm,
     font = \small\sffamily,
@@ -184,8 +185,8 @@ http://jbp.io/}
   ]
     \node[compf] (hi0) {h};
     \node[compf] (hi1) [right=of hi0] {h};
-    \node[compf] (ho0) [below=7 of hi0] {h};
-    \node[compf] (ho1) [below=7 of hi1] {h};
+    \node[compf] (ho0) [below=5 of hi0] {h};
+    \node[compf] (ho1) [below=5 of hi1] {h};
 
     \draw[->] (hi0) -- (hi1);
     \draw[->] (ho0) -- (ho1);
@@ -196,15 +197,15 @@ http://jbp.io/}
     \draw[->] (initi) -- (hi0);
     \draw[->] (inito) -- (ho0);
 
-    \node (ki) [above=of hi0] {$key \oplus ipad$};
-    \node (ko) [above=of ho0] {$key \oplus opad$};
+    \node (ki) [above=of initi] {$key \oplus ipad$};
+    \node (ko) [above=of inito] {$key \oplus opad$};
     \node (msg) [above=of hi1] {$message$};
 
-    \draw[->] (ki) to (hi0);
-    \draw[->] (ko) to (ho0);
+    \draw[->] (ki) -| (hi0);
+    \draw[->] (ko) -| (ho0);
     \draw[->] (msg) to (hi1);
 
-    \draw[->] (hi1.east) -- ++(3,0) -- ++(0,-5) -| (ho1);
+    \draw[->] (hi1.east) -- ++(3,0) -- ++(0,-4.5) -| (ho1);
 
     \node (sig) [right=of ho1] {sig};
     \draw[->] (ho1) -- (sig);
@@ -227,7 +228,6 @@ http://jbp.io/}
 
   \begin{center}
   \begin{tikzpicture}[
-    remember picture,
     y = .25cm,
     x = .25cm,
     font = \small\sffamily,
@@ -277,9 +277,35 @@ http://jbp.io/}
   \end{center}
 
   \begin{itemize}
-    \item<2> Parametised with a PRF, usually HMAC.
+    \item<2> Parameterised with a PRF, usually HMAC.
     \item<3> Tunable computation cost, with iteration count.
+    \item<4> Origin: RSA labs, 1999. Described in PKCS\#5 and then RFC2898.
   \end{itemize}
+}
+
+\frame
+{
+  \beginner \frametitle{Intro: PBKDF2}
+
+  \begin{block}{Iteration count choice}<1>
+    \begin{enumerate}
+      \item Choose computation budget (say, 50ms).
+      \item Find iteration count which takes that long with your implementation.
+    \end{enumerate}
+  \end{block}
+
+  \begin{alertblock}{Performance}<2>
+    Performance profile is \emph{important} for defenders.  Aim: to
+    maximise attacker work for defender computation budget.
+  \end{alertblock}
+
+  \begin{exampleblock}{Simplification}<3>
+    PBKDF2 can produce arbitrary length output.
+
+    We're going to ignore this capability: assume it produces
+    the same length output as the underlying hash.
+    %\footnote{because it's broken, and complicates matters}
+  \end{exampleblock}
 }
 
 \frame
@@ -288,7 +314,6 @@ http://jbp.io/}
 
   \begin{center}
   \begin{tikzpicture}[
-    remember picture,
     y = .25cm,
     x = .25cm,
     font = \small\sffamily,
@@ -330,7 +355,7 @@ http://jbp.io/}
     \node[hmacf] (u1) {HMAC};
     \node[hmacf] (u2) [right=3 of u1] {HMAC};
     \node[hmacf] (u3) [right=3 of u2] {HMAC};
-    \node (salt) [left=3 of u1] {$salt\ \Vert\ 0_{32}$};
+    \node (salt) [left=3 of u1] {salt};
     \node (password) [above=3 of u1] {password};
     \node [below=1 of u1] {$U_1$};
     \node [below=1 of u2] {$U_2$};
@@ -354,10 +379,10 @@ http://jbp.io/}
   \end{tikzpicture}
   {\footnotesize 
   \begin{align*}
-    \text{PBKDF2}_\text{HMAC}(\text{pw}, \text{salt}, \text{i}) &\coloneqq U_1 \oplus U_2 \oplus \cdots \oplus U_\text{i} \\
+    \text{PBKDF2}_\text{HMAC}(\text{password}, \text{salt}, \text{i}) &\coloneqq U_1 \oplus U_2 \oplus \cdots \oplus U_\text{i} \\
     \text{where} \\
-    U_1 &\coloneqq \text{HMAC}(\text{pw}, \text{salt}\ \Vert\ 0_{32}) \\
-    U_n &\coloneqq \text{HMAC}(\text{pw}, U_{n-1}) \\
+    U_1 &\coloneqq \text{HMAC}(\text{password}, \text{salt}) \\
+    U_n &\coloneqq \text{HMAC}(\text{password}, U_{n-1}) \\
   \end{align*}
   }
 
@@ -366,55 +391,143 @@ http://jbp.io/}
 
 \frame
 {
-  \beginner \frametitle{PBKDF2: quick intro}
+  \beginner \frametitle{PBKDF2: perf vs. iteration count}
 
-  \begin{block}{Origin}<2>
-    RSA labs, 1999. Described in PKCS\#5 and then RFC2898
-  \end{block}
-  
-  \begin{block}{Usage}<3>
-    \begin{itemize}
-      \item Password verification (web sites, network services, etc.)
-      \item Key derivation (disk encryption, key management, etc.)
-    \end{itemize}
-  \end{block}
+  One HMAC per iteration.
+
+  \begin{center}
+  \begin{tikzpicture}[
+    y = .25cm,
+    x = .25cm,
+    font = \small\sffamily,
+    compf/.style = {
+      rectangle,
+      draw=green!50,
+      rounded corners=1mm,
+      top color=green!10,
+      bottom color=green!30,
+      very thick,
+      inner sep=5mm,
+      outer sep=1mm
+    },
+    hmacf/.style = {
+      rectangle,
+      draw=blue!50,
+      rounded corners=1mm,
+      top color=blue!10,
+      bottom color=blue!30,
+      very thick,
+      inner sep=5mm,
+      outer sep=1mm
+    },
+    kdff/.style = {
+      rectangle,
+      draw=purple!50,
+      rounded corners=1mm,
+      top color=purple!10,
+      bottom color=purple!30,
+      very thick,
+      inner sep=5mm,
+      outer sep=1mm
+    },
+    labela/.style = {
+      draw=blue!50,
+      very thick
+    }
+  ]
+    \node[hmacf] (un) {HMAC};
+    \node (inp) [left=3 of un] {output of $U_{n-1}$};
+    \node (out) [right=3 of un] {input to $U_{n+1}$};
+    \node (password) [above=3 of un] {password};
+    \node [below=1 of un] {$U_n$};
+
+    \draw[->] (password) -- (un);
+    \draw[->] (inp) -- (un);
+    \draw[->] (un) -- (out);
+
+  \end{tikzpicture}
+  \end{center}
+
+  How many compression function applications?
 }
 
 \frame
 {
-  \beginner \frametitle{PBKDF2: quick intro}
+  \frametitle{PBKDF2: perf vs. iteration count}
 
-  \begin{alertblock}{Performance}<1>
-    Performance profile is \emph{important} for defenders.  Aim: to
-    maximise attacker work for defender computation budget.
-  \end{alertblock}
-
-  \begin{exampleblock}{Simplification}<2>
-    PBKDF2 can produce arbitrary length output.
-
-    We're going to ignore this capability
-    from here on in: only considering the first block of output.
-    %\footnote{because it's broken, and complicates matters}
-  \end{exampleblock}
-}
-
-\frame
-{
-  \beginner \frametitle{PBKDF2: how it was described}
-
-  \begin{align*}
-    \text{PBKDF2}_\text{PRF}(\text{pw}, \text{salt}, \text{i}) &\coloneqq U_1 \oplus U_2 \oplus \cdots \oplus U_\text{i} \\
-    \onslide<2->{
-      \text{where} \\
-      U_1 &\coloneqq \text{PRF}(\text{pw}, \text{salt}\ \Vert\ 0_{32}) \\
-      U_n &\coloneqq \text{PRF}(\text{pw}, U_{n-1}) \\
+  \begin{center}
+  \begin{tikzpicture}[
+    y = .25cm,
+    x = .25cm,
+    font = \small\sffamily,
+    compf/.style = {
+      rectangle,
+      draw=green!50,
+      rounded corners=1mm,
+      top color=green!10,
+      bottom color=green!30,
+      very thick,
+      inner sep=5mm,
+      outer sep=1mm
+    },
+    hmacf/.style = {
+      rectangle,
+      draw=blue!50,
+      rounded corners=1mm,
+      top color=blue!10,
+      bottom color=blue!30,
+      very thick,
+      inner sep=5mm,
+      outer sep=1mm
+    },
+    labela/.style = {
+      draw=blue!50,
+      very thick
     }
-    \onslide<3->{
-      \text{and typically} \\
-      \text{PRF}(\text{pw}, \text{x}) &= \text{HMAC-H}(\text{pw}, \text{x}) \\
-      H &= \text{SHA-1, SHA-256, SHA-512, or ...}
+  ]
+    \node[compf] (hi0) {h};
+    \node[compf] (hi1) [right=of hi0] {h};
+    \node[compf] (ho0) [below=5 of hi0] {h};
+    \node[compf] (ho1) [below=5 of hi1] {h};
+
+    \draw[->] (hi0) -- (hi1);
+    \draw[->] (ho0) -- (ho1);
+
+    \node (initi) [left=3 of hi0] {init};
+    \node (inito) [left=3 of ho0] {init};
+
+    \draw[->] (initi) -- (hi0);
+    \draw[->] (inito) -- (ho0);
+
+    \node (ki) [above=of initi] {$password \oplus ipad$};
+    \node (ko) [above=of inito] {$password \oplus opad$};
+    \node (msg) [above=of hi1] {output of $U_{n-1}$};
+
+    \draw[->] (ki) -| (hi0);
+    \draw[->] (ko) -| (ho0);
+    \draw[->] (msg) to (hi1);
+
+    \draw[->] (hi1.east) -- ++(3,0) -- ++(0,-4.5) -| (ho1);
+
+    \node (sig) [right=of ho1] {input to $U_{n+1}$};
+    \draw[->] (ho1) -- (sig);
+
+    \node at (5,-15) {$U_n$};
+
+    \uncover<3>{
+    \filldraw[red,nearly transparent] (-15,10) rectangle (4, -15);
     }
-  \end{align*}
+
+  \end{tikzpicture}
+
+  \end{center}
+
+  \alt<2->{
+    \textcolor{red}{Conclusion: $4i$ compression function applications for $i$ iterations?}
+  }{
+    Conclusion: $4i$ compression function applications for $i$ iterations.
+  }
+
 }
 
 \frame
@@ -455,12 +568,12 @@ http://jbp.io/}
     }
     \onslide<3->{
       \text{with} \\
-      U_1 &\coloneqq \text{HMAC-H}(\text{pw}, \text{salt}\ \Vert\ 0_{32}) \\
+      U_1 &\coloneqq \text{HMAC-H}(\text{pw}, \text{salt}) \\
       U_n &\coloneqq \text{HMAC-H}(\text{pw}, U_{n-1}) \\
     }
     \onslide<4->{
       \text{(or equivalently)} \\
-      U_1 &\coloneqq \text{H}(\alert<5->{\text{pw} \oplus \text{opad}}\ \Vert\ \text{H}(\alert<5->{pw \oplus \text{ipad}}\ \Vert\ \text{salt}\ \Vert\ 0_{32})) \\
+      U_1 &\coloneqq \text{H}(\alert<5->{\text{pw} \oplus \text{opad}}\ \Vert\ \text{H}(\alert<5->{pw \oplus \text{ipad}}\ \Vert\ \text{salt})) \\
       U_n &\coloneqq \text{H}(\alert<5->{\text{pw} \oplus \text{opad}}\ \Vert\ \text{H}(\alert<5->{pw \oplus \text{ipad}}\ \Vert\ U_{n-1}))
     }
   \end{align*}
