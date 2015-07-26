@@ -514,43 +514,11 @@ http://jbp.io/}
 
     \node at (5,-15) {$U_n$};
 
-    \uncover<3>{
-    \filldraw[red,nearly transparent] (-15,10) rectangle (4, -15);
-    }
-
   \end{tikzpicture}
 
   \end{center}
 
-  \alt<2->{
-    \textcolor{red}{Conclusion: $4i$ compression function applications for $i$ iterations?}
-  }{
-    Conclusion: $4i$ compression function applications for $i$ iterations.
-  }
-
-}
-
-\frame
-{
-  \frametitle{Zoom, enhance}
-
-  The function $\text{PBKDF2}_{\text{HMAC-SHA-256}}$ is slow because it
-  executes the SHA-256 compression function many times.
-
-  \begin{block}{How many times?}<2->
-    Assumption: password and salt much shorter than SHA-256's 64-byte block size.
-  \begin{align*}
-    \text{HMAC-H}(key, msg) &\coloneqq
-      \text{H}(\alert<5>{key \oplus \text{opad}}\ \Vert\ 
-      \alert<6>{\text{H}(\alert<3>{key \oplus \text{ipad}}\ \Vert\ \alert<4>{msg})}) \\
-    \onslide<3>{\text{block 1} &: key \oplus \text{ipad}} \\
-    \onslide<4>{\text{block 2} &: msg} \\
-    \onslide<5>{\text{block 3} &: key \oplus \text{opad}} \\
-    \onslide<6>{\text{block 4} &: \text{block 2 output}}
-  \end{align*}
-
-  \uncover<7->{Therefore, we need to compute $4\text{i}$ SHA-256 blocks.}
-  \end{block}
+  \uncover<2>{Conclusion: $4i$ compression function applications for $i$ iterations.}
 }
 
 \frame
@@ -560,29 +528,146 @@ http://jbp.io/}
   This is suboptimal.  Neither of the standards mention this, or
   even describe the expected performance :(
 
-  \only<1>{\vspace{1cm}\includegraphics[width=11cm]{imgs/dilbert-2009-09-01.png}}
-
-  \begin{align*}
-    \onslide<2->{
-    & U_1 \oplus U_2 \oplus \cdots \oplus U_\text{i} \\
+  \begin{center}
+  \begin{tikzpicture}[
+    y = .25cm,
+    x = .25cm,
+    font = \small\sffamily,
+    compf/.style = {
+      rectangle,
+      draw=green!50,
+      rounded corners=1mm,
+      top color=green!10,
+      bottom color=green!30,
+      very thick,
+      inner sep=5mm,
+      outer sep=1mm
+    },
+    hmacf/.style = {
+      rectangle,
+      draw=blue!50,
+      rounded corners=1mm,
+      top color=blue!10,
+      bottom color=blue!30,
+      very thick,
+      inner sep=5mm,
+      outer sep=1mm
+    },
+    labela/.style = {
+      draw=blue!50,
+      very thick
     }
-    \onslide<3->{
-      \text{with} \\
-      U_1 &\coloneqq \text{HMAC-H}(\text{pw}, \text{salt}) \\
-      U_n &\coloneqq \text{HMAC-H}(\text{pw}, U_{n-1}) \\
-    }
-    \onslide<4->{
-      \text{(or equivalently)} \\
-      U_1 &\coloneqq \text{H}(\alert<5->{\text{pw} \oplus \text{opad}}\ \Vert\ \text{H}(\alert<5->{pw \oplus \text{ipad}}\ \Vert\ \text{salt})) \\
-      U_n &\coloneqq \text{H}(\alert<5->{\text{pw} \oplus \text{opad}}\ \Vert\ \text{H}(\alert<5->{pw \oplus \text{ipad}}\ \Vert\ U_{n-1}))
-    }
-  \end{align*}
+  ]
+    \node[compf] (hi0) {h};
+    \node[compf] (hi1) [right=of hi0] {h};
+    \node[compf] (ho0) [below=5 of hi0] {h};
+    \node[compf] (ho1) [below=5 of hi1] {h};
 
-  \uncover<5->{We can compute these blocks once.}
+    \draw[->] (hi0) -- (hi1);
+    \draw[->] (ho0) -- (ho1);
 
-  \begin{block}{How many times?}<6->
-    Actually, we only need compute $2 + 2i$ SHA-256 blocks.
-  \end{block}
+    \node (initi) [left=3 of hi0] {init};
+    \node (inito) [left=3 of ho0] {init};
+
+    \draw[->] (initi) -- (hi0);
+    \draw[->] (inito) -- (ho0);
+
+    \node (ki) [above=of initi] {$password \oplus ipad$};
+    \node (ko) [above=of inito] {$password \oplus opad$};
+    \node (msg) [above=of hi1] {output of $U_{n-1}$};
+
+    \draw[->] (ki) -| (hi0);
+    \draw[->] (ko) -| (ho0);
+    \draw[->] (msg) to (hi1);
+
+    \draw[->] (hi1.east) -- ++(3,0) -- ++(0,-4.5) -| (ho1);
+
+    \node (sig) [right=of ho1] {input to $U_{n+1}$};
+    \draw[->] (ho1) -- (sig);
+
+    \node at (5,-15) {$U_n$};
+
+    \uncover<2>{
+    \filldraw[red,nearly transparent] (-15,9) rectangle (4, -15);
+    }
+
+  \end{tikzpicture}
+  \end{center}
+}
+
+\frame
+{
+  \begin{center}
+  \begin{tikzpicture}[
+    y = .25cm,
+    x = .25cm,
+    font = \small\sffamily,
+    compf/.style = {
+      rectangle,
+      draw=green!50,
+      rounded corners=1mm,
+      top color=green!10,
+      bottom color=green!30,
+      very thick,
+      inner sep=5mm,
+      outer sep=1mm
+    },
+    hmacf/.style = {
+      rectangle,
+      draw=blue!50,
+      rounded corners=1mm,
+      top color=blue!10,
+      bottom color=blue!30,
+      very thick,
+      inner sep=5mm,
+      outer sep=1mm
+    },
+    labela/.style = {
+      draw=blue!50,
+      very thick
+    }
+  ]
+    \node[compf] (hi0) {h};
+    \node[compf] (hi1) [right=11 of hi0] {h};
+    \node[compf] (ho0) [below=5 of hi0] {h};
+    \node[compf] (ho1) [below=5 of hi1] {h};
+
+    \node (initi) [left=3 of hi0] {init};
+    \node (inito) [left=3 of ho0] {init};
+    \node (precompi) [right=1 of hi0] {init$_i$};
+    \node (precompo) [right=1 of ho0] {init$_o$};
+    \node (precompi1) [left=1 of hi1] {init$_i$};
+    \node (precompo1) [left=1 of ho1] {init$_o$};
+
+    \draw[->] (initi) -- (hi0);
+    \draw[->] (inito) -- (ho0);
+
+    \draw[->] (hi0) -- (precompi);
+    \draw[->] (ho0) -- (precompo);
+
+    \draw[->] (precompi1) -- (hi1);
+    \draw[->] (precompo1) -- (ho1);
+
+    \node (ki) [above=of initi] {$password \oplus ipad$};
+    \node (ko) [above=of inito] {$password \oplus opad$};
+    \node (msg) [above=of hi1] {output of $U_{n-1}$};
+
+    \draw[->] (ki) -| (hi0);
+    \draw[->] (ko) -| (ho0);
+    \draw[->] (msg) to (hi1);
+
+    \draw[->] (hi1.east) -- ++(3,0) -- ++(0,-4.5) -| (ho1);
+
+    \node (sig) [right=of ho1] {input to $U_{n+1}$};
+    \draw[->] (ho1) -- (sig);
+
+    \node [below=3 of ho0] {precomputation};
+    \node [below=3 of ho1] {$U_n$};
+
+  \end{tikzpicture}
+  \end{center}
+  
+  \uncover<2>{Actually $2 + 2i$ compression function applications for $i$ iterations.}
 }
 
 \frame
@@ -717,7 +802,7 @@ http://jbp.io/}
     \foreach \y in {1,3,...,21} {
       \draw (0pt,\y) -- (-1pt,\y);
     }
-    \node[rotate=90, above=0.8cm] at (y axis mid) {Seconds};
+    \node[rotate=90, left=1cm] at (y axis mid) {Seconds};
 
     \node[fast,label=right:\openssltime] at (1,\openssltime) {};
     \node[thing] at (1,-1.5) {OpenSSL};
