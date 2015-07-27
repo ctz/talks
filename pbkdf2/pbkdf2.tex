@@ -1,10 +1,11 @@
-\documentclass{beamer}
+\documentclass[aspectratio=169]{beamer}
 \usepackage{fancyvrb}
 \usepackage{mathtools}
 \usepackage{amsmath}
 \usepackage{xcolor}
 \usepackage{tikz}
 \usepackage{graphicx}
+\usepackage{caption}
 
 \usetikzlibrary{calc}
 \usetikzlibrary{positioning}
@@ -845,7 +846,7 @@ http://jbp.io/}
 
   \end{tikzpicture}
   
-  \caption{PBKDF2-HMAC-SHA1, one block output, $2^{22}$ iterations}
+  \caption*{PBKDF2-HMAC-SHA1, one block output, $2^{22}$ iterations}
   \end{figure}
 
 }
@@ -866,15 +867,32 @@ http://jbp.io/}
 
 \frame
 {
+  \frametitle{fastpbkdf2}
+
+  \begin{columns}[c]
+    \column{.48\textwidth}
+      \begin{figure}[h]
+        \includegraphics[width=\textwidth]{imgs/boxplot-openssl.png}
+        \caption*{OpenSSL}
+      \end{figure}
+
+    \column{.48\textwidth}
+      \begin{figure}[h]
+        \includegraphics[width=\textwidth]{imgs/boxplot-fast.png}
+        \caption*{fastpbkdf2}
+      \end{figure}
+  \end{columns}
+}
+
+\frame
+{
   \frametitle{Parting thoughts...}
 
   \begin{itemize}
     \item<1-> PBKDF2 is a poor design, and described in an unhelpful way by its authors.
     \item<2-> Most implementations waste time and power.
-    \item<3-> If you use PBKDF2, you can probably drop in a faster implementation\only<3>{.}
-              \only<4>{and either
-              increase security margin, or improve time/power performance.}
-    \item<4-> Please try not to use PBKDF2 any more.
+    \item<3-> If you use PBKDF2, you can probably drop in a faster implementation (and either
+              increase security margin, or improve time/power performance.)
   \end{itemize}
 }
 
@@ -892,6 +910,8 @@ http://jbp.io/}
   Web: https://jbp.io/
 
   Slides and benchmarking code: https://github.com/ctz/talks/
+
+  fastpbkdf2 code: https://github.com/ctz/fastpbkdf2/
 }
 
 \end{document}
