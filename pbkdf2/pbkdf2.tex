@@ -15,6 +15,7 @@
 \usefonttheme{structurebold}
 \setbeamercovered{again covered=\opaqueness<1->{50}}
 \setbeamertemplate{navigation symbols}{}
+%\setbeameroption{show notes}
 
 \newcommand{\highlight}[1]{%
   \colorbox{red!50}{$\displaystyle#1$}}
@@ -859,7 +860,7 @@ http://jbp.io/}
   \begin{itemize}
     \item<1-> About 400 lines of C99.
     \item<2-> Uses OpenSSL libcrypto's hash functions.
-    \item<3-> CC0.
+    \item<3-> Public domain (CC0).
     \item<4-> https://github.com/ctz/fastpbkdf2/
   \end{itemize}
 }
@@ -881,6 +882,92 @@ http://jbp.io/}
         \caption*{fastpbkdf2}
       \end{figure}
   \end{columns}
+}
+
+\frame
+{
+  \frametitle{But wait, there's more!}
+
+  I lied about not talking about long PBKDF2 outputs.
+
+  \begin{itemize}
+  \item<1> You repeat the whole algorithm (with a counter appended to the salt) and concatenate the outputs.
+  \item<2> All(?) defender implementations do this sequentially.
+  \item<3> Attackers often don't need to compute all blocks to win.
+  \item<4> Really, you don't want this.  There are better ways\footnote<4>{run pbkdf2 once to spend time, then use that result as input to pbkdf2 with iterations=1 to expand output.}.
+  \end{itemize}
+
+  \uncover<5->{
+  But, in any case, fastpbkdf2 optionally parallelises this.
+  }
+}
+
+\note{
+  \begin{itemize}
+  \item Attackers can parallelise this freely, or (for cracking database dumps) perhaps don't even need to compute all the blocks at all.
+  \item So you really ought not to ask for more than one block of PBKDF2 output.  It's extremely broken.
+  \item However, if you do need that (backwards compat), fastpbkdf2 optionally parallelises this computation too.
+  \item Uses OpenMP for portability.
+  \end{itemize}
+}
+
+\frame
+{
+  \frametitle{But wait, there's more!}
+
+  \input multi.tex
+  
+  \begin{figure}
+  \centering
+
+  \begin{tikzpicture}[
+    y = .13cm,
+    x = .9cm,
+    font = \small\sffamily,
+    osl/.style = {circle, draw=green!50, fill=green!20, thick, inner sep=0.8mm, outer sep=1mm},
+    fast/.style = {circle, draw=blue!50, fill=blue!20, thick, inner sep=0.8mm, outer sep=1mm},
+    mult/.style = {circle, draw=purple!50, fill=purple!20, thick, inner sep=0.8mm, outer sep=1mm},
+    thing/.style = {font=\footnotesize},
+    maybe/.style = {draw=black!50},
+  ]
+    \draw (0,0) -- coordinate (y axis mid) (0,50);
+    \draw (0,0) -- (10,0);
+    \foreach \y in {0,5,...,50} {
+      \draw (0pt,\y) -- (-3pt,\y) node[anchor=east] {\y};
+      \draw (0,\y) -- (10,\y) [gray!30];
+    }
+    \node[rotate=90, left=1cm] at (y axis mid) {Wall time (seconds)};
+
+    \draw (1,\opensslone) -- (3,\openssltwo) -- (5,\opensslthree) -- (7,\opensslfour);
+
+    \node[osl] at (1,\opensslone) {};
+    \node[osl] at (3,\openssltwo) {};
+    \node[osl] at (5,\opensslthree) {};
+    \node[osl,label=right:OpenSSL] at (7,\opensslfour) {};
+
+    \uncover<2->{
+    \draw (1,\fastsingleone) -- (3,\fastsingletwo) -- (5,\fastsinglethree) -- (7,\fastsinglefour);
+
+    \node[fast] at (1,\fastsingleone) {};
+    \node[fast] at (3,\fastsingletwo) {};
+    \node[fast] at (5,\fastsinglethree) {};
+    \node[fast,label=right:fastpbkdf2 (single thread)] at (7,\fastsinglefour) {};
+    }
+    
+    \uncover<3->{
+    \draw (1,\fastmultione) -- (3,\fastmultitwo) -- (5,\fastmultithree) -- (7,\fastmultifour);
+    
+    \node[mult] at (1,\fastmultione) {};
+    \node[mult] at (3,\fastmultitwo) {};
+    \node[mult] at (5,\fastmultithree) {};
+    \node[mult,label=right:fastpbkdf2 (multi thread)] at (7,\fastmultifour) {};
+    }
+
+  \end{tikzpicture}
+  
+  \caption*{PBKDF2-HMAC-SHA1, one-four blocks output, $2^{22}$ iterations, two cores + HT}
+  \end{figure}
+
 }
 
 \frame
