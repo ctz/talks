@@ -52,6 +52,7 @@ http://jbp.io/}
       \end{enumerate}
   \end{columns}
 }
+\note{}
 
 \frame
 {
@@ -103,6 +104,7 @@ http://jbp.io/}
   \end{tikzpicture}
   \end{center}
 }
+\note{}
 
 \frame
 {
@@ -150,6 +152,7 @@ http://jbp.io/}
   \end{tikzpicture}
   \end{center}
 }
+\note{}
 
 \frame
 {
@@ -221,6 +224,7 @@ http://jbp.io/}
   {\footnotesize (for messages shorter than a block!) }
   \end{center}
 }
+\note{}
 
 \frame
 {
@@ -284,6 +288,7 @@ http://jbp.io/}
     \item<4> Origin: RSA labs, 1999. Described in PKCS\#5 and then RFC2898.
   \end{itemize}
 }
+\note{}
 
 \frame
 {
@@ -309,6 +314,7 @@ http://jbp.io/}
     %\footnote{because it's broken, and complicates matters}
   \end{exampleblock}
 }
+\note{}
 
 \frame
 {
@@ -390,6 +396,7 @@ http://jbp.io/}
 
   \end{center}
 }
+\note{}
 
 \frame
 {
@@ -452,6 +459,7 @@ http://jbp.io/}
 
   How many compression function applications?
 }
+\note{}
 
 \frame
 {
@@ -522,6 +530,7 @@ http://jbp.io/}
 
   \uncover<2>{Conclusion: $4i$ compression function applications for $i$ iterations.}
 }
+\note{}
 
 \frame
 {
@@ -596,6 +605,7 @@ http://jbp.io/}
   \end{tikzpicture}
   \end{center}
 }
+\note{}
 
 \frame
 {
@@ -671,6 +681,13 @@ http://jbp.io/}
   
   \uncover<2>{Actually $2 + 2i$ compression function applications for $i$ iterations.}
 }
+\note{
+  \begin{itemize}
+  \item Do HMAC key setup once, reuse that work.
+  \item Better locality of reference too.
+  \end{itemize}
+}
+
 
 \frame
 {
@@ -711,6 +728,7 @@ http://jbp.io/}
   
   \footnotetext[1]{never called for scrypt/yescrypt with iterations != 1}
 }
+\note{}
 
 \frame
 {
@@ -759,6 +777,14 @@ http://jbp.io/}
 
   \end{columns}
 }
+\note{
+  \begin{itemize}
+  \item Note: not blaming implementors.
+  \item Minor structural changes in PBKDF2 would fix this for all impls.
+  \item Failing that, doc changes would likely have improved matters.
+  \end{itemize}
+}
+
 
 \frame
 {
@@ -774,6 +800,7 @@ http://jbp.io/}
   {\small Measured on Intel Atom N2800 (1.86GHz), best of five runs, CPU time in user mode.}
   }
 }
+\note{}
 
 \frame
 {
@@ -848,8 +875,19 @@ http://jbp.io/}
   
   \caption*{PBKDF2-HMAC-SHA1, one block output, $2^{22}$ iterations}
   \end{figure}
-
 }
+\note{
+  \begin{itemize}
+  \item OpenSSL is a good baseline to compare against.
+  \item Python3.4 has the same basic impl as OpenSSL = same perf.
+  \item Others are slow.
+  \item Patch for PHP5 is upstream, gives good improvement.
+  \item If we assume similar improvements for others, they end up
+    competitive.
+  \item But we can do better!
+  \end{itemize}
+}
+
 
 \frame
 {
@@ -864,6 +902,7 @@ http://jbp.io/}
     \item<4-> https://github.com/ctz/fastpbkdf2/
   \end{itemize}
 }
+\note{}
 
 \frame
 {
@@ -883,6 +922,13 @@ http://jbp.io/}
       \end{figure}
   \end{columns}
 }
+\note{
+  \begin{itemize}
+  \item boxplot from kcachegrind/valgrind-callgrind.
+  \item Area roughly proportional to cpu time.
+  \item No memory copies, allocations, conversions, padding in inner loop.
+  \end{itemize}
+}
 
 \frame
 {
@@ -901,7 +947,6 @@ http://jbp.io/}
   But, in any case, fastpbkdf2 optionally parallelises this.
   }
 }
-
 \note{
   \begin{itemize}
   \item Attackers can parallelise this freely, or (for cracking database dumps) perhaps don't even need to compute all the blocks at all.
@@ -967,8 +1012,8 @@ http://jbp.io/}
   
   \caption*{PBKDF2-HMAC-SHA1, one-four blocks output, $2^{22}$ iterations, two cores + HT}
   \end{figure}
-
 }
+\note{}
 
 \frame
 {
@@ -981,6 +1026,7 @@ http://jbp.io/}
               increase security margin, or improve time/power performance.)
   \end{itemize}
 }
+\note{}
 
 \frame
 {
