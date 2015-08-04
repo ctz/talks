@@ -29,7 +29,7 @@
 \title[pbkdf2]{PBKDF2: performance matters}
 \author{Joseph Birr-Pixton\\
 @jpixton\\
-http://jbp.io/}
+https://jbp.io/}
 \date{}
 
 \begin{document}
@@ -218,7 +218,7 @@ http://jbp.io/}
   \end{tikzpicture}
 
   {\small
-  $\text{HMAC-H}(key, message) \coloneqq \text{H}(key \oplus \text{opad}\ \Vert\ \text{H}({key \oplus \text{ipad}}\ \Vert\ message))$
+  $\text{HMAC-H}(key, message) \coloneqq \text{H}( (key \oplus \text{opad}) \ \Vert\ \text{H}( ({key \oplus \text{ipad}}) \ \Vert\ message))$
   }
 
   {\footnotesize (for messages shorter than a block!) }
@@ -785,6 +785,15 @@ http://jbp.io/}
   \end{itemize}
 }
 
+\frame
+{
+  \frametitle{Don't blame implementors for bad crypto standards}
+
+  \begin{figure}
+  \centering
+  \includegraphics[width=.9\textwidth]{imgs/wolf-doge.jpg}
+  \end{figure}
+}
 
 \frame
 {
@@ -830,7 +839,7 @@ http://jbp.io/}
     \foreach \y in {1,3,...,21} {
       \draw (0pt,\y) -- (-1pt,\y);
     }
-    \node[rotate=90, left=1cm] at (y axis mid) {Seconds};
+    \node[rotate=90, left=1cm] at (y axis mid) {CPU time (seconds)};
 
     \node[fast,label=right:\openssltime] at (1,\openssltime) {};
     \node[thing] at (1,-1.5) {OpenSSL};
@@ -1035,15 +1044,39 @@ http://jbp.io/}
 
   \vspace{5em}
 
-  Twitter: @jpixton
+  \begin{columns}[c]
+    \column{.22\textwidth}
+      Twitter:
 
-  Mail: jbp@jbp.io
+      Mail:
 
-  Web: https://jbp.io/
+      Web:
 
-  Slides and benchmarking code: https://github.com/ctz/talks/
+      Slides and notes:
 
-  fastpbkdf2 code: https://github.com/ctz/fastpbkdf2/
+      fastpbkdf2:
+
+    \column{.48\textwidth}
+      @jpixton
+
+      jbp@jbp.io
+
+      https://jbp.io/
+
+      https://github.com/ctz/talks/
+
+      https://github.com/ctz/fastpbkdf2/
+  \end{columns}
+
+%  Twitter: @jpixton
+%
+%  Mail: jbp@jbp.io
+%
+%  Web: https://jbp.io/
+%
+%  Slides and benchmarking code: https://github.com/ctz/talks/
+%
+%  fastpbkdf2 code: https://github.com/ctz/fastpbkdf2/
 }
 
 \end{document}
