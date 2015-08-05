@@ -306,11 +306,9 @@ https://jbp.io/}
     maximise attacker work for defender computation budget.
   \end{alertblock}
 
-  \begin{exampleblock}{Simplification}<3>
-    PBKDF2 can produce arbitrary length output.
-
-    We're going to ignore this capability: assume it produces
-    the same length output as the underlying hash.
+  \begin{exampleblock}{For simplicity}<3>
+    Assume salts, passwords are less than block size.
+    Assume output length is not more than hash output size.
     %\footnote{because it's broken, and complicates matters}
   \end{exampleblock}
 }
@@ -693,8 +691,9 @@ https://jbp.io/}
 {
   \frametitle{Survey of defender implementations}
 
-  I looked at the following PBKDF2s:
+  \only<1>{I looked at the following PBKDF2s:}
 
+  \only<2>{
   \begin{columns}[T]
     \column{.48\textwidth}
     \begin{itemize}
@@ -702,13 +701,14 @@ https://jbp.io/}
       \item GRUB 2.0
       \item Truecrypt 7.1a
       \item Android (disk encryption)
-      \item Android (BouncyCastle)
+      \item Android BouncyCastle fork
       \item Django
       \item OpenSSL
       \item Python core ($\ge$3.4)
       \item Python (pypi pbkdf2)
       \item Ruby (pbkdf2 gem)
       \item Go (go.crypto)
+      \item Apple CoreCrypto (disassembly)
     \end{itemize}
     \column{.48\textwidth}
     \begin{itemize}
@@ -716,7 +716,7 @@ https://jbp.io/}
       \item PolarSSL/mbedTLS
       \item CyaSSL/wolfSSL
       \item SJCL
-      \item Java
+      \item Java (OpenJDK)
       \item Common Lisp (ironclad)
       \item Perl (Crypt::PBKDF2)
       \item PHP5
@@ -727,6 +727,7 @@ https://jbp.io/}
   \end{columns}
   
   \footnotetext[1]{never called for scrypt/yescrypt with iterations != 1}
+  }
 }
 \note{}
 
@@ -743,6 +744,7 @@ https://jbp.io/}
         \item<2-> Python core ($\ge$3.4)
         \item<2-> Django (CVE-2013-1443, sc00bz)
         \item<2-> BouncyCastle ($\ge$1.49)
+        \item<2-> Apple CoreCrypto (?)
       \end{itemize}
     \end{exampleblock}
    
@@ -751,7 +753,6 @@ https://jbp.io/}
       \begin{itemize}
         \item FreeBSD 10
         \item OpenBSD
-        \item GRUB 2.0
       \end{itemize}
     \end{alertblock}
     }
@@ -760,13 +761,13 @@ https://jbp.io/}
     \uncover<4->{
     \begin{alertblock}{Slow: compute $4i$ blocks}
       \begin{itemize}
+        \item GRUB 2.0
         \item Python (pypi pbkdf2)
         \item Ruby (pbkdf2 gem)
         \item Go (go.crypto)
         \item PolarSSL/mbedTLS
         \item CyaSSL/wolfSSL
         \item Java (OpenJDK)
-        \item Common Lisp (ironclad)
         \item Perl (Crypt::PBKDF2)
         \item PHP
         \item .NET framework
@@ -949,7 +950,7 @@ https://jbp.io/}
   \item<1> You repeat the whole algorithm (with a counter appended to the salt) and concatenate the outputs.
   \item<2> All(?) defender implementations do this sequentially.
   \item<3> Attackers often don't need to compute all blocks to win.
-  \item<4> Really, you don't want this.  There are better ways\footnote<4>{run pbkdf2 once to spend time, then use that result as input to pbkdf2 with iterations=1 to expand output.}.
+  \item<4> Really, you don't want this.  There are better ways ({\footnotesize e.g., run PBKDF2 once to spend time, then use result as input to PBKDF2 with iterations=1 to stretch output to required length}).
   \end{itemize}
 
   \uncover<5->{
