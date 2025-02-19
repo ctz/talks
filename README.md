@@ -9,3 +9,4 @@ This is an archive of talks I have given:
 - [rustls: modern, fast, safer TLS](rustls-defcon.pdf): Defcon 25 (2017)
 - [rustls: modern, fast, safer TLS](rustls-rustfest.pdf): RustFest Paris (2018)
 - [Replacing OpenSSL, one step at a time](rustls-libssl-rustnl.pdf): RustNL Delft (2024)
+- [graviola: fast, high-assurance cryptography for rust](graviola-rustnation.pdf): Rust Nation UK London (2025)
