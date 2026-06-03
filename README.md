@@ -11,3 +11,4 @@ This is an archive of talks I have given:
 - [Replacing OpenSSL, one step at a time](rustls-libssl-rustnl.pdf): RustNL Delft (2024)
 - [graviola: fast, high-assurance cryptography for rust](graviola-rustnation.pdf): Rust Nation UK London (2025)
 - [graviola: fast, high-assurance cryptography for rust](graviola-rustweek.pdf): Rustweek Utrecht (2025)
+- [upki: Improving Certificate Revocation on Linux](upki-ubuntu-summit.pdf): Ubuntu Summit London (2026) (joint work with @djc)
