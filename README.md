@@ -12,3 +12,4 @@ This is an archive of talks I have given:
 - [📹](https://www.youtube.com/watch?v=n6gA93iSj68) [graviola: fast, high-assurance cryptography for rust](graviola-rustnation.pdf): Rust Nation UK London (2025)
 - [📹](https://www.youtube.com/watch?v=zmxMh06OtXc) [graviola: fast, high-assurance cryptography for rust](graviola-rustweek.pdf): Rustweek Utrecht (2025)
 - [📹](https://youtu.be/oTcGTPPV_Bc?t=24497)  [upki: Improving Certificate Revocation on Linux](upki-ubuntu-summit.pdf): Ubuntu Summit London (2026) (joint work with @djc)
+- ✳️ [A Decade of Rustls](rustls-decade.pdf): RustConf (2026) (joint presentation with @cpu)
